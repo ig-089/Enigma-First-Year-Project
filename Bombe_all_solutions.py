@@ -90,26 +90,35 @@ def check_order(orders):
                     for first_plug in l1:
                         decryption_test = "A"
 
+                        #This is dictionary for plug connections that spread like in a graph tree.
+                        #They are saved by assuptions and propagations.
                         plugboard_pairs = {}
 
+                        #For assumption that letter is connected.
                         if first_crib_letter != first_plug:
                             plug_number = 1
                             plugboard_pairs[first_crib_letter] = first_plug
                             plugboard_pairs[first_plug] = first_crib_letter
 
+                        #Not connected
                         else:
                             plug_number = 0
                             plugboard_pairs[first_crib_letter] = first_plug
 
+                        #Appends needed assumption.
                         plugboard_variants.append((plugboard_pairs, plug_number))
-
+                     
+                        # Continues until all assumptions are destroyed.
                         while len(plugboard_variants) > 0:
 
+                            #Removes assumption to test it by propagation or rejection.
                             plugboard_pairs, plug_number = plugboard_variants.pop()
 
+                            #Indexes for contradiction and added consequences.
                             impossible = 0
                             added = 1
 
+                            #Continues until no contradiction, consequences continue and plugs are fines.
                             while impossible == 0 and added == 1 and plug_number < 7:
 
 
@@ -129,6 +138,7 @@ def check_order(orders):
 
                                     cribInBranch = (crib_letter in plugboard_pairs)
 
+                                    #This is long check for logical contradictions.
                                     if cribInBranch or (cipher_letter in plugboard_pairs):
 
                                         if cribInBranch:
@@ -171,18 +181,19 @@ def check_order(orders):
                                         elif (plugboard_pairs[opposite_letter] != rotor_output) or (plugboard_pairs[rotor_output] != opposite_letter):
 
                                             impossible = 1
-
+                                    #One rotor operation above does one step for enigma.
                                     else:
                                         machine.rotate(1)
 
+                                    #Checks if contradiction was obtained.
                                     if impossible == 1 or plug_number > 6:
                                         break
 
-
+                            #Checks if contradiction was obtained.
                             if impossible == 1 or plug_number > 6:
                                 continue
 
-
+                            #Checks if 6 plugs obtained work.
                             if plug_number == 6:
 
                                 machine.rotorBuffer[0].rotorPosition = window[0]
@@ -215,6 +226,7 @@ def check_order(orders):
     
                             letter_assumed = "NO"
 
+                            #Checks if assumption was already made.
                             for assumption in l1:
 
                                 if assumption not in plugboard_pairs:
@@ -225,7 +237,8 @@ def check_order(orders):
 
                             if letter_assumed == "NO":
                                 continue
-    
+
+                            #Creates new assumption reviewing old assumptions.
                             for assumption in l1:
         
                                 if assumption in plugboard_pairs:
@@ -245,6 +258,7 @@ def check_order(orders):
 
                                     plugboard_variants.append((plugboard_pairs_expanded, plug_number))
 
+                        #Checks if solution was obtained.
                         if crib == decryption_test:
                                 break
                         
